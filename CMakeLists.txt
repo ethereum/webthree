@@ -29,6 +29,7 @@ add_subdirectory(libwebthree)
 add_subdirectory(libweb3jsonrpc)
 add_subdirectory(libwhisper)
 add_subdirectory(eth)
+add_subdirectory(ethconsole)
 
 # test stuff
 add_subdirectory(test)
