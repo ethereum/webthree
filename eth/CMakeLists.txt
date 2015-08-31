@@ -9,7 +9,6 @@ file(GLOB HEADERS "*.h")
 add_executable(${EXECUTABLE} ${SRC_LIST} ${HEADERS})
 
 eth_use(${EXECUTABLE} REQUIRED Web3::web3jsonrpc JsonRpc::Client Eth::jsconsole)
-eth_use(${EXECUTABLE} OPTIONAL Readline)
 
 if (APPLE)
 	install(TARGETS ${EXECUTABLE} DESTINATION bin)
