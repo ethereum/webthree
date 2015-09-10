@@ -6,7 +6,8 @@ file(GLOB HEADERS "*.h")
 
 add_executable(${EXECUTABLE} ${SRC_LIST} ${HEADERS})
 
-eth_use(${EXECUTABLE} REQUIRED Web3::web3jsonrpc JsonRpc::Client Web3::jsconsole)
+set(ETHASHCL 1)
+eth_use(${EXECUTABLE} REQUIRED Web3::web3jsonrpc JsonRpc::Client Web3::jsconsole Eth::ethash-cl)
 eth_use(${EXECUTABLE} OPTIONAL Readline)
 
 if (APPLE)
