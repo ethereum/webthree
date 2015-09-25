@@ -62,7 +62,7 @@ bool UnixDomainSocketServer::StartListening()
 		if (access(m_path.c_str(), F_OK) != -1)
 			return false;
 
-		m_socket = socket(PF_UNIX, SOCK_STREAM, 0);
+		m_socket = socket(PF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, 0);
 		memset(&(m_address), 0, sizeof(sockaddr_un));
 		m_address.sun_family = AF_UNIX;
 #ifdef __APPLE__
