@@ -44,13 +44,17 @@ WebThreeDirect::WebThreeDirect(
 	WithExisting _we,
 	std::set<std::string> const& _interfaces,
 	NetworkPreferences const& _n,
-	bytesConstRef _network
+	bytesConstRef _network,
+	unsigned const _statePruning,
 ):
 	m_clientVersion(_clientVersion),
 	m_net(_clientVersion, _n, _network)
 {
 	if (_dbPath.size())
 		Defaults::setDBPath(_dbPath);
+	if (_statePruning)
+		Defaults::setStatePruning(_statePruning);
+
 	if (_interfaces.count("eth"))
 	{
 		m_ethereum.reset(new eth::EthashClient(&m_net, shared_ptr<GasPricer>(), _dbPath, _we));
