@@ -45,7 +45,7 @@ WebThreeDirect::WebThreeDirect(
 	std::set<std::string> const& _interfaces,
 	NetworkPreferences const& _n,
 	bytesConstRef _network,
-	unsigned const _statePruning,
+	unsigned const _statePruning
 ):
 	m_clientVersion(_clientVersion),
 	m_net(_clientVersion, _n, _network)
