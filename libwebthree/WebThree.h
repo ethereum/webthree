@@ -122,7 +122,8 @@ public:
 		WithExisting _we = WithExisting::Trust,
 		std::set<std::string> const& _interfaces = {"eth", "shh", "bzz"},
 		p2p::NetworkPreferences const& _n = p2p::NetworkPreferences(),
-		bytesConstRef _network = bytesConstRef()
+		bytesConstRef _network = bytesConstRef(),
+		unsigned const _blockDBPruning
 	);
 
 	/// Destructor.
