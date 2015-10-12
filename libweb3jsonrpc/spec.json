@@ -58,6 +58,7 @@
 { "name": "eth_sendRawTransaction", "params": [""], "order": [], "returns": true},
 { "name": "eth_notePassword", "params": [""], "order": [], "returns": true},
 { "name": "eth_syncing", "params": [], "order": [], "returns": {}},
+{ "name": "eth_estimateGas", "params": [{}], "order": [], "returns": ""},
 
 { "name": "db_put", "params": ["", "", ""], "order": [], "returns": true},
 { "name": "db_get", "params": ["", ""], "order": [], "returns": ""},
@@ -98,7 +99,10 @@
 { "name": "admin_eth_getReceiptByHashAndIndex", "params": ["", 0, ""], "returns": {} },
 
 { "name": "personal_newAccount", "params": [""], "returns": "" },
-{ "name": "personal_unlockAccount", "params": ["", "", 0], "returns": true }
+{ "name": "personal_unlockAccount", "params": ["", "", 0], "returns": true },
+
+{ "name": "bzz_put", "params": [""], "returns": ""},
+{ "name": "bzz_get", "params": [""], "returns": ""}
 
 ]
 

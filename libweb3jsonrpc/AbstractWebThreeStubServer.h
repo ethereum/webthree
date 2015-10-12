@@ -69,6 +69,7 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
             this->bindAndAddMethod(jsonrpc::Procedure("eth_sendRawTransaction", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_BOOLEAN, "param1",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::eth_sendRawTransactionI);
             this->bindAndAddMethod(jsonrpc::Procedure("eth_notePassword", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_BOOLEAN, "param1",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::eth_notePasswordI);
             this->bindAndAddMethod(jsonrpc::Procedure("eth_syncing", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT,  NULL), &AbstractWebThreeStubServer::eth_syncingI);
+            this->bindAndAddMethod(jsonrpc::Procedure("eth_estimateGas", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_OBJECT, NULL), &AbstractWebThreeStubServer::eth_estimateGasI);
             this->bindAndAddMethod(jsonrpc::Procedure("db_put", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_BOOLEAN, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING,"param3",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::db_putI);
             this->bindAndAddMethod(jsonrpc::Procedure("db_get", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::db_getI);
             this->bindAndAddMethod(jsonrpc::Procedure("shh_post", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_BOOLEAN, "param1",jsonrpc::JSON_OBJECT, NULL), &AbstractWebThreeStubServer::shh_postI);
@@ -106,6 +107,8 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
             this->bindAndAddMethod(jsonrpc::Procedure("admin_eth_getReceiptByHashAndIndex", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_INTEGER,"param3",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::admin_eth_getReceiptByHashAndIndexI);
             this->bindAndAddMethod(jsonrpc::Procedure("personal_newAccount", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::personal_newAccountI);
             this->bindAndAddMethod(jsonrpc::Procedure("personal_unlockAccount", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_BOOLEAN, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING,"param3",jsonrpc::JSON_INTEGER, NULL), &AbstractWebThreeStubServer::personal_unlockAccountI);
+            this->bindAndAddMethod(jsonrpc::Procedure("bzz_put", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::bzz_putI);
+            this->bindAndAddMethod(jsonrpc::Procedure("bzz_get", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING, NULL), &AbstractWebThreeStubServer::bzz_getI);
         }
 
         inline virtual void web3_sha3I(const Json::Value &request, Json::Value &response)
@@ -353,6 +356,10 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
             (void)request;
             response = this->eth_syncing();
         }
+        inline virtual void eth_estimateGasI(const Json::Value &request, Json::Value &response)
+        {
+            response = this->eth_estimateGas(request[0u]);
+        }
         inline virtual void db_putI(const Json::Value &request, Json::Value &response)
         {
             response = this->db_put(request[0u].asString(), request[1u].asString(), request[2u].asString());
@@ -502,6 +509,14 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
         {
             response = this->personal_unlockAccount(request[0u].asString(), request[1u].asString(), request[2u].asInt());
         }
+        inline virtual void bzz_putI(const Json::Value &request, Json::Value &response)
+        {
+            response = this->bzz_put(request[0u].asString());
+        }
+        inline virtual void bzz_getI(const Json::Value &request, Json::Value &response)
+        {
+            response = this->bzz_get(request[0u].asString());
+        }
         virtual std::string web3_sha3(const std::string& param1) = 0;
         virtual std::string web3_clientVersion() = 0;
         virtual std::string net_version() = 0;
@@ -559,6 +574,7 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
         virtual bool eth_sendRawTransaction(const std::string& param1) = 0;
         virtual bool eth_notePassword(const std::string& param1) = 0;
         virtual Json::Value eth_syncing() = 0;
+        virtual std::string eth_estimateGas(const Json::Value& param1) = 0;
         virtual bool db_put(const std::string& param1, const std::string& param2, const std::string& param3) = 0;
         virtual std::string db_get(const std::string& param1, const std::string& param2) = 0;
         virtual bool shh_post(const Json::Value& param1) = 0;
@@ -596,6 +612,8 @@ class AbstractWebThreeStubServer : public jsonrpc::AbstractServer<AbstractWebThr
         virtual Json::Value admin_eth_getReceiptByHashAndIndex(const std::string& param1, int param2, const std::string& param3) = 0;
         virtual std::string personal_newAccount(const std::string& param1) = 0;
         virtual bool personal_unlockAccount(const std::string& param1, const std::string& param2, int param3) = 0;
+        virtual std::string bzz_put(const std::string& param1) = 0;
+        virtual std::string bzz_get(const std::string& param1) = 0;
 };
 
 #endif //JSONRPC_CPP_STUB_ABSTRACTWEBTHREESTUBSERVER_H_

@@ -48,6 +48,10 @@ namespace shh
 {
 class Interface;
 }
+namespace bzz
+{
+class Interface;
+}
 
 extern const unsigned SensibleHttpThreads;
 extern const unsigned SensibleHttpPort;
@@ -94,7 +98,7 @@ public:
 	virtual std::string web3_sha3(std::string const& _param1);
 	virtual std::string web3_clientVersion() { return "C++ (ethereum-cpp)"; }
 
-	virtual std::string net_version() { return ""; }
+	virtual std::string net_version();
 	virtual std::string net_peerCount();
 	virtual bool net_listening();
 
@@ -115,6 +119,7 @@ public:
 	virtual std::string eth_getCode(std::string const& _address, std::string const& _blockNumber);
 	virtual std::string eth_sendTransaction(Json::Value const& _json);
 	virtual std::string eth_call(Json::Value const& _json, std::string const& _blockNumber);
+	virtual std::string eth_estimateGas(Json::Value const& _json);
 	virtual bool eth_flush();
 	virtual Json::Value eth_getBlockByHash(std::string const& _blockHash, bool _includeTransactions);
 	virtual Json::Value eth_getBlockByNumber(std::string const& _blockNumber, bool _includeTransactions);
@@ -153,6 +158,9 @@ public:
 
 	virtual bool db_put(std::string const& _name, std::string const& _key, std::string const& _value);
 	virtual std::string db_get(std::string const& _name, std::string const& _key);
+
+	virtual std::string bzz_put(std::string const& _data);
+	virtual std::string bzz_get(std::string const& _hash);
 
 	virtual bool shh_post(Json::Value const& _json);
 	virtual std::string shh_newIdentity();
@@ -206,8 +214,9 @@ protected:
 	void setTransactionDefaults(eth::TransactionSkeleton & _t);
 	virtual bool hasPrivilegeLevel(std::string const& _session, Privilege _l) const { (void)_session; (void)_l; return false; }
 
-	virtual dev::eth::Interface* client() = 0;
-	virtual std::shared_ptr<dev::shh::Interface> face() = 0;
+	virtual dev::eth::Interface* client() = 0;					// TODO: rename to eth
+	virtual std::shared_ptr<dev::shh::Interface> face() = 0;	// TODO: rename to shh
+	virtual dev::bzz::Interface* bzz() = 0;
 	virtual dev::WebThreeNetworkFace* network() = 0;
 	virtual dev::WebThreeStubDatabaseFace* db() = 0;
 

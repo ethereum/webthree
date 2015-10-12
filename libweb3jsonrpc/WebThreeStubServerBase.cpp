@@ -37,6 +37,7 @@
 #include <libevmcore/Instruction.h>
 #include <liblll/Compiler.h>
 #include <libethereum/Client.h>
+#include <libwebthree/Swarm.h>
 #include <libwebthree/WebThree.h>
 #include <libethcore/CommonJS.h>
 #include <libwhisper/Message.h>
@@ -81,6 +82,11 @@ string WebThreeStubServerBase::web3_sha3(string const& _param1)
 	return toJS(sha3(jsToBytes(_param1)));
 }
 
+string WebThreeStubServerBase::net_version()
+{
+	return toJS((unsigned)c_network);
+}
+
 string WebThreeStubServerBase::net_peerCount()
 {
 	return toJS(network()->peerCount());
@@ -113,7 +119,7 @@ bool WebThreeStubServerBase::eth_mining()
 
 string WebThreeStubServerBase::eth_gasPrice()
 {
-	return toJS(10 * dev::eth::szabo);
+	return toJS(client()->gasBidPrice());
 }
 
 Json::Value WebThreeStubServerBase::eth_accounts()
@@ -242,14 +248,10 @@ string WebThreeStubServerBase::eth_getCode(string const& _address, string const&
 	}
 }
 
-void WebThreeStubServerBase::setTransactionDefaults(TransactionSkeleton & _t)
+void WebThreeStubServerBase::setTransactionDefaults(TransactionSkeleton& _t)
 {
 	if (!_t.from)
 		_t.from = m_ethAccounts->defaultTransactAccount();
-	if (_t.gasPrice == UndefinedU256)
-		_t.gasPrice = client()->gasBidPrice();
-	if (_t.gas == UndefinedU256)
-		_t.gas = min<u256>(client()->gasLimitRemaining() / 5, client()->balanceAt(_t.from) / _t.gasPrice);
 }
 
 string WebThreeStubServerBase::eth_sendTransaction(Json::Value const& _json)
@@ -312,7 +314,22 @@ string WebThreeStubServerBase::eth_call(Json::Value const& _json, string const& 
 	{
 		TransactionSkeleton t = toTransactionSkeleton(_json);
 		setTransactionDefaults(t);
-		return toJS(client()->call(t.from, t.value, t.to, t.data, t.gas, t.gasPrice, jsToBlockNumber(_blockNumber), FudgeFactor::Lenient).output);
+		ExecutionResult er = client()->call(t.from, t.value, t.to, t.data, t.gas, t.gasPrice, jsToBlockNumber(_blockNumber), FudgeFactor::Lenient);
+		return toJS(er.output);
+	}
+	catch (...)
+	{
+		BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INVALID_PARAMS));
+	}
+}
+
+string WebThreeStubServerBase::eth_estimateGas(Json::Value const& _json)
+{
+	try
+	{
+		TransactionSkeleton t = toTransactionSkeleton(_json);
+		setTransactionDefaults(t);
+		return toJS(client()->estimateGas(t.from, t.value, t.to, t.data, t.gas, t.gasPrice, PendingBlock).first);
 	}
 	catch (...)
 	{
@@ -833,6 +850,16 @@ bool WebThreeStubServerBase::db_put(string const& _name, string const& _key, str
 string WebThreeStubServerBase::db_get(string const& _name, string const& _key)
 {
 	return db()->get(_name, _key);;
+}
+
+string WebThreeStubServerBase::bzz_put(string const& _data)
+{
+	return toJS(bzz()->put(jsToBytes(_data)));
+}
+
+string WebThreeStubServerBase::bzz_get(string const& _hash)
+{
+	return toJS(bzz()->get(jsToFixed<32>(_hash)));
 }
 
 bool WebThreeStubServerBase::shh_post(Json::Value const& _json)
