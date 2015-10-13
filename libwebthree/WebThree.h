@@ -123,7 +123,7 @@ public:
 		std::set<std::string> const& _interfaces = {"eth", "shh", "bzz"},
 		p2p::NetworkPreferences const& _n = p2p::NetworkPreferences(),
 		bytesConstRef _network = bytesConstRef(),
-		unsigned const _blockDBPruning
+		unsigned const _blockDBPruning = 0
 	);
 
 	/// Destructor.
