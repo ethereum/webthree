@@ -81,14 +81,14 @@ struct Setup
 			TrivialGasPricer gp;
 			accountHolder.reset(new FixedAccountHolder([&](){return web3->ethereum();}, {}));
 			whisperFace = new rpc::Whisper(*web3, {});
-			ethFace = new rpc::Eth(*web3->ethereum(), *accountHolder.get());
 			netFace = new rpc::Net(*web3);
 			w3Face = new rpc::Web3(web3->clientVersion());
 			adminNetFace = new rpc::AdminNet(*web3, sm);
 			adminUtilsFace = new rpc::AdminUtils(sm);
-			modularServer.reset(new ModularServer<rpc::EthFace, rpc::WhisperFace, rpc::NetFace, rpc::Web3Face, rpc::AdminNetFace, rpc::AdminUtilsFace>(ethFace, whisperFace, netFace, w3Face, adminNetFace, adminUtilsFace));
-			modularServer->addConnector(server);
-			modularServer->StartListening();
+//			ethFace = new rpc::Eth(*web3->ethereum(), *accountHolder.get());
+//			modularServer.reset(new ModularServer<rpc::EthFace, rpc::WhisperFace, rpc::NetFace, rpc::Web3Face, rpc::AdminNetFace, rpc::AdminUtilsFace>(ethFace, whisperFace, netFace, w3Face, adminNetFace, adminUtilsFace));
+//			modularServer->addConnector(server);
+//			modularServer->StartListening();
 			auto client = new jsonrpc::HttpClient("http://localhost:8080");
 			jsonrpcClient = unique_ptr<WebThreeStubClient>(new WebThreeStubClient(*client));
 		}
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(serverBasic)
 	BOOST_REQUIRE_EQUAL(s, c_version);
 
 	s = netFace->net_version();
-	BOOST_REQUIRE(s.empty());
+	BOOST_REQUIRE(!s.empty());
 
 	s = w3Face->web3_sha3("some pseudo-random string here");
 	BOOST_REQUIRE_EQUAL(s.size(), h256::size * 2 + 2);
