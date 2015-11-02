@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(serverBasic)
 	BOOST_REQUIRE_EQUAL(s, c_version);
 
 	s = jsonrpcServer->net_version();
-	BOOST_REQUIRE(s.empty());
+	BOOST_REQUIRE(!s.empty());
 
 	s = jsonrpcServer->web3_sha3("some pseudo-random string here");
 	BOOST_REQUIRE_EQUAL(s.size(), h256::size * 2 + 2);
