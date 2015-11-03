@@ -102,6 +102,7 @@ void help()
 		<< endl
 		<< "    -o,--mode <full/peer>  Start a full node or a peer node (default: full)." << endl
 		<< endl
+		<< "    --blockDB-pruning <n> Only store history of the last n blocks in state tree." << endl
 #if ETH_JSONRPC || !ETH_TRUE
 		<< "    -j,--json-rpc  Enable JSON-RPC server (default: off)." << endl
 		<< "    --ipc  Enable IPC server (default: on)." << endl
@@ -298,6 +299,8 @@ int main(int argc, char** argv)
 	/// Operating mode.
 	OperationMode mode = OperationMode::Node;
 	string dbPath;
+	unsigned blockDBPruning = 0;
+
 //	unsigned prime = 0;
 //	bool yesIReallyKnowWhatImDoing = false;
 
@@ -576,6 +579,8 @@ int main(int argc, char** argv)
 		}
 		else if ((arg == "-d" || arg == "--path" || arg == "--db-path") && i + 1 < argc)
 			dbPath = argv[++i];
+		else if ((arg == "--blockDB-pruning") && i + 1 < argc)
+			blockDBPruning = atoi(argv[++i]);
 		else if ((arg == "--genesis-json" || arg == "--genesis") && i + 1 < argc)
 		{
 			try
@@ -953,7 +958,8 @@ int main(int argc, char** argv)
 		withExisting,
 		nodeMode == NodeMode::Full ? caps : set<string>(),
 		netPrefs,
-		&nodesState);
+		&nodesState,
+		blockDBPruning);
 	web3.ethereum()->setMineOnBadChain(mineOnWrongChain);
 	web3.ethereum()->setSentinel(sentinel);
 	if (!extraData.empty())
