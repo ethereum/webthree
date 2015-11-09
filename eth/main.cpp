@@ -969,7 +969,6 @@ int main(int argc, char** argv)
 		nodeMode == NodeMode::Full ? caps : set<string>(),
 		netPrefs,
 		&nodesState);
-	web3.ethereum()->setMineOnBadChain(mineOnWrongChain);
 	web3.ethereum()->setSentinel(sentinel);
 	if (!extraData.empty())
 		web3.ethereum()->setExtraData(extraData);
