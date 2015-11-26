@@ -68,7 +68,7 @@ MainCLI::MainCLI(Mode _mode):
 bool MainCLI::interpretOption(int& i, int argc, char** argv)
 {
 	string arg = argv[i];
-	if (arg == "console")
+	if (arg == "console" || arg == "-i")
 		m_mode = Mode::Console;
 	else if (arg == "benchmark")
 		m_mode = Mode::Benchmark;
