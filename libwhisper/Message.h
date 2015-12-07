@@ -127,7 +127,7 @@ public:
 private:
 	bool populate(bytes const& _data);
 	bool openBroadcastEnvelope(Envelope const& _e, Topics const& _t, bytes& o_b);
-	Secret generateGamma(Secret const& _key, h256 const& _salt) const { return sha3(_key ^ _salt); }
+	Secret generateGamma(Secret const& _key, h256 const& _salt) const;
 
 	Public m_from;
 	Public m_to;

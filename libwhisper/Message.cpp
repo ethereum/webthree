@@ -138,6 +138,28 @@ Envelope Message::seal(Secret const& _from, Topics const& _fullTopics, unsigned 
 	return ret;
 }
 
+Secret Message::generateGamma(Secret const& _key, h256 const& _salt) const 
+{
+	unsigned const c_iterations = 512;
+	bytesSec ret(Secret::size);
+
+	// exactly the same as in dev::pbkdf2()
+	unsigned x = CryptoPP::PKCS5_PBKDF2_HMAC<CryptoPP::SHA256>().DeriveKey(
+		ret.writable().data(),
+		Secret::size,
+		0,
+		reinterpret_cast<byte const*>(_key.data()),
+		Secret::size,
+		_salt.data(),
+		h256::size,
+		c_iterations);
+
+	if (c_iterations == x)
+		return Secret(ret);
+	else
+		return sha3(_key ^ _salt);
+}
+
 Envelope::Envelope(RLP const& _m)
 {
 	m_expiry = _m[0].toInt<unsigned>();
