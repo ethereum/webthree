@@ -41,6 +41,12 @@ std::string Net::net_peerCount()
 	return toJS(m_network.peerCount());
 }
 
+bool Net::net_addPeer(std::string const& _node)
+{
+	m_network.addPeer(p2p::NodeSpec(_node), p2p::PeerType::Required);
+	return true;
+}
+
 bool Net::net_listening()
 {
 	return m_network.isNetworkStarted();
