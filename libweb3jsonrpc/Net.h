@@ -42,6 +42,7 @@ public:
 	}
 	virtual std::string net_version() override;
 	virtual std::string net_peerCount() override;
+	virtual bool net_addPeer(std::string const& _node) override;
 	virtual bool net_listening() override;
 
 private:
