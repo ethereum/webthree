@@ -196,7 +196,7 @@ Json::Value AdminEth::admin_eth_vmTrace(string const& _blockNumberOrHash, int _t
 {
 	RPC_ADMIN;
 	
-	Json::Value ret;
+	Json::Value ret(Json::objectValue);
 	
 	if (_txIndex < 0)
 		throw jsonrpc::JsonRpcException("Negative index");
@@ -214,7 +214,12 @@ Json::Value AdminEth::admin_eth_vmTrace(string const& _blockNumberOrHash, int _t
 			if (!e.execute())
 				e.go(st.onOp());
 			e.finalize();
-			Json::Reader().parse(st.json(), ret);
+			string temp = st.json();
+			Json::Value trace;
+			Json::Reader().parse(temp, trace);
+			ret["vmtrace"] = trace;
+			ret["codes"] = st.codes();
+			ret["codesmap"] = st.codesMap();
 		}
 		catch(Exception const& _e)
 		{
