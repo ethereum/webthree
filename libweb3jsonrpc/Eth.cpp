@@ -25,17 +25,11 @@
 #include <jsonrpccpp/common/exception.h>
 #include <libdevcore/CommonData.h>
 #include <libevmcore/Instruction.h>
-#include <liblll/Compiler.h>
 #include <libethereum/Client.h>
 #include <libethashseal/EthashClient.h>
 #include <libwebthree/WebThree.h>
 #include <libethcore/CommonJS.h>
 #include <libweb3jsonrpc/JsonHelper.h>
-#if ETH_SOLIDITY || !ETH_TRUE
-#include <libsolidity/interface/CompilerStack.h>
-#include <libsolidity/parsing/Scanner.h>
-#include <libsolidity/interface/SourceReferenceFormatter.h>
-#endif
 #include "Eth.h"
 #include "AccountHolder.h"
 #include "JsonHelper.h"
@@ -132,6 +126,25 @@ string Eth::eth_getStorageAt(string const& _address, string const& _position, st
 	{
 		BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INVALID_PARAMS));
 	}
+}
+
+string Eth::eth_pendingTransactions()
+{
+	//Return list of transaction that being sent by local accounts
+	Transactions ours;
+	for (Transaction const& pending:client()->pending())
+	{
+		for (Address const& account:m_ethAccounts.allAccounts())
+		{
+			if (pending.sender() == account)
+			{
+				ours.push_back(pending);
+				break;
+			}
+		}
+	}
+
+	return toJS(ours);
 }
 
 string Eth::eth_getTransactionCount(string const& _address, string const& _blockNumber)
@@ -479,88 +492,6 @@ Json::Value Eth::eth_getUncleByBlockNumberAndIndex(string const& _blockNumber, s
 	{
 		BOOST_THROW_EXCEPTION(JsonRpcException(Errors::ERROR_RPC_INVALID_PARAMS));
 	}
-}
-
-Json::Value Eth::eth_getCompilers()
-{
-	Json::Value ret(Json::arrayValue);
-	ret.append("lll");
-#if ETH_SOLIDITY || !TRUE
-	ret.append("solidity");
-#endif
-	return ret;
-}
-
-
-string Eth::eth_compileLLL(string const& _source)
-{
-	// TODO throw here jsonrpc errors
-	string res;
-	vector<string> errors;
-	res = toJS(dev::eth::compileLLL(_source, true, &errors));
-	cwarn << "LLL compilation errors: " << errors;
-	return res;
-}
-
-string Eth::eth_compileSerpent(string const& _source)
-{
-	(void)_source;
-	BOOST_THROW_EXCEPTION(JsonRpcException("Serpent compilation not supported!"));
-}
-
-Json::Value Eth::eth_compileSolidity(string const& _source)
-{
-	// TOOD throw here jsonrpc errors
-	Json::Value res(Json::objectValue);
-#if ETH_SOLIDITY || !ETH_TRUE
-	dev::solidity::CompilerStack compiler;
-	try
-	{
-		compiler.addSource("source", _source);
-		compiler.compile();
-
-		for (string const& name: compiler.contractNames())
-		{
-			Json::Value contract(Json::objectValue);
-			LinkerObject const& obj = compiler.object();
-			if (!obj.linkReferences.empty())
-			{
-				cwarn << "Solidity: Compilation resulted in unlinked object.";
-				return Json::Value();
-			}
-			contract["code"] = toJS(obj.bytecode);
-
-			Json::Value info(Json::objectValue);
-			info["source"] = _source;
-			info["language"] = "";
-			info["languageVersion"] = "";
-			info["compilerVersion"] = "";
-
-			Json::Reader reader;
-			reader.parse(compiler.interface(name), info["abiDefinition"]);
-			reader.parse(compiler.metadata(name, dev::solidity::DocumentationType::NatspecUser), info["userDoc"]);
-			reader.parse(compiler.metadata(name, dev::solidity::DocumentationType::NatspecDev), info["developerDoc"]);
-
-			contract["info"] = info;
-			res[name] = contract;
-		}
-	}
-	catch (dev::Exception const& exception)
-	{
-		ostringstream error;
-		solidity::SourceReferenceFormatter::printExceptionInformation(error, exception, "Error", compiler);
-		cwarn << "Solidity compilation error: " << error.str();
-		return Json::Value(Json::objectValue);
-	}
-	catch (...)
-	{
-		cwarn << "Uncought solidity compilation exception";
-		return Json::Value(Json::objectValue);
-	}
-#else
-	(void)_source;
-#endif
-	return res;
 }
 
 string Eth::eth_newFilter(Json::Value const& _json)
