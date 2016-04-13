@@ -24,6 +24,7 @@ namespace dev {
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getBalance", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getBalanceI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getStorageAt", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING,"param3",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getStorageAtI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getTransactionCount", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getTransactionCountI);
+                    this->bindAndAddMethod(jsonrpc::Procedure("eth_pendingTransactions", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING,  NULL), &dev::rpc::EthFace::eth_pendingTransactionsI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getBlockTransactionCountByHash", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getBlockTransactionCountByHashI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getBlockTransactionCountByNumber", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getBlockTransactionCountByNumberI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getUncleCountByBlockHash", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getUncleCountByBlockHashI);
@@ -40,10 +41,6 @@ namespace dev {
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getTransactionReceipt", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getTransactionReceiptI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getUncleByBlockHashAndIndex", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getUncleByBlockHashAndIndexI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_getUncleByBlockNumberAndIndex", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING,"param2",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_getUncleByBlockNumberAndIndexI);
-                    this->bindAndAddMethod(jsonrpc::Procedure("eth_getCompilers", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_ARRAY,  NULL), &dev::rpc::EthFace::eth_getCompilersI);
-                    this->bindAndAddMethod(jsonrpc::Procedure("eth_compileLLL", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_compileLLLI);
-                    this->bindAndAddMethod(jsonrpc::Procedure("eth_compileSerpent", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_compileSerpentI);
-                    this->bindAndAddMethod(jsonrpc::Procedure("eth_compileSolidity", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_OBJECT, "param1",jsonrpc::JSON_STRING, NULL), &dev::rpc::EthFace::eth_compileSolidityI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_newFilter", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_OBJECT, NULL), &dev::rpc::EthFace::eth_newFilterI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_newFilterEx", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING, "param1",jsonrpc::JSON_OBJECT, NULL), &dev::rpc::EthFace::eth_newFilterExI);
                     this->bindAndAddMethod(jsonrpc::Procedure("eth_newBlockFilter", jsonrpc::PARAMS_BY_POSITION, jsonrpc::JSON_STRING,  NULL), &dev::rpc::EthFace::eth_newBlockFilterI);
@@ -116,6 +113,11 @@ namespace dev {
                 {
                     response = this->eth_getTransactionCount(request[0u].asString(), request[1u].asString());
                 }
+                inline virtual void eth_pendingTransactionsI(const Json::Value &request, Json::Value &response)
+                {
+                    (void)request;
+                    response = this->eth_pendingTransactions();
+                }
                 inline virtual void eth_getBlockTransactionCountByHashI(const Json::Value &request, Json::Value &response)
                 {
                     response = this->eth_getBlockTransactionCountByHash(request[0u].asString());
@@ -180,23 +182,6 @@ namespace dev {
                 inline virtual void eth_getUncleByBlockNumberAndIndexI(const Json::Value &request, Json::Value &response)
                 {
                     response = this->eth_getUncleByBlockNumberAndIndex(request[0u].asString(), request[1u].asString());
-                }
-                inline virtual void eth_getCompilersI(const Json::Value &request, Json::Value &response)
-                {
-                    (void)request;
-                    response = this->eth_getCompilers();
-                }
-                inline virtual void eth_compileLLLI(const Json::Value &request, Json::Value &response)
-                {
-                    response = this->eth_compileLLL(request[0u].asString());
-                }
-                inline virtual void eth_compileSerpentI(const Json::Value &request, Json::Value &response)
-                {
-                    response = this->eth_compileSerpent(request[0u].asString());
-                }
-                inline virtual void eth_compileSolidityI(const Json::Value &request, Json::Value &response)
-                {
-                    response = this->eth_compileSolidity(request[0u].asString());
                 }
                 inline virtual void eth_newFilterI(const Json::Value &request, Json::Value &response)
                 {
@@ -304,6 +289,7 @@ namespace dev {
                 virtual std::string eth_getBalance(const std::string& param1, const std::string& param2) = 0;
                 virtual std::string eth_getStorageAt(const std::string& param1, const std::string& param2, const std::string& param3) = 0;
                 virtual std::string eth_getTransactionCount(const std::string& param1, const std::string& param2) = 0;
+                virtual std::string eth_pendingTransactions() = 0;
                 virtual Json::Value eth_getBlockTransactionCountByHash(const std::string& param1) = 0;
                 virtual Json::Value eth_getBlockTransactionCountByNumber(const std::string& param1) = 0;
                 virtual Json::Value eth_getUncleCountByBlockHash(const std::string& param1) = 0;
@@ -320,10 +306,6 @@ namespace dev {
                 virtual Json::Value eth_getTransactionReceipt(const std::string& param1) = 0;
                 virtual Json::Value eth_getUncleByBlockHashAndIndex(const std::string& param1, const std::string& param2) = 0;
                 virtual Json::Value eth_getUncleByBlockNumberAndIndex(const std::string& param1, const std::string& param2) = 0;
-                virtual Json::Value eth_getCompilers() = 0;
-                virtual std::string eth_compileLLL(const std::string& param1) = 0;
-                virtual std::string eth_compileSerpent(const std::string& param1) = 0;
-                virtual Json::Value eth_compileSolidity(const std::string& param1) = 0;
                 virtual std::string eth_newFilter(const Json::Value& param1) = 0;
                 virtual std::string eth_newFilterEx(const Json::Value& param1) = 0;
                 virtual std::string eth_newBlockFilter() = 0;
