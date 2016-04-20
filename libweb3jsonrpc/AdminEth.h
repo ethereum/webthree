@@ -38,7 +38,7 @@ public:
 	virtual bool admin_eth_setMiningBenefactor(std::string const& _uuidOrAddress, std::string const& _session) override;
 	virtual Json::Value admin_eth_inspect(std::string const& _address, std::string const& _session) override;
 	virtual Json::Value admin_eth_reprocess(std::string const& _blockNumberOrHash, std::string const& _session) override;
-	virtual Json::Value admin_eth_vmTrace(std::string const& _blockNumberOrHash, int _txIndex, std::string const& _session) override;
+	virtual Json::Value admin_eth_vmTrace(std::string const& _blockNumberOrHash, int _txIndex) override;
 	virtual Json::Value admin_eth_getReceiptByHashAndIndex(std::string const& _blockNumberOrHash, int _txIndex, std::string const& _session) override;
 	virtual bool miner_start(int _threads) override;
 	virtual bool miner_stop() override;
