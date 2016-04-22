@@ -5,6 +5,9 @@ set(EXECUTABLE eth)
 file(GLOB HEADERS "*.h")
 
 add_executable(${EXECUTABLE} ${SRC_LIST} ${HEADERS})
+if (WIN32)
+	target_link_libraries(${EXECUTABLE} shlwapi)
+endif()
 
 eth_use(${EXECUTABLE} REQUIRED Web3::web3jsonrpc JsonRpc::Client Web3::webthree Eth::ethcore Eth::p2p Eth::devcrypto Eth::ethereum Eth::ethashseal)
 eth_use(${EXECUTABLE} OPTIONAL Eth::evmjit)
