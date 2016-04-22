@@ -8,6 +8,9 @@ set(EXECUTABLE ethrpctest)
 file(GLOB HEADERS "*.h")
 
 add_executable(${EXECUTABLE} ${SRC_LIST} ${HEADERS})
+if (WIN32)
+	target_link_libraries(${EXECUTABLE} shlwapi)
+endif()
 
 eth_use(${EXECUTABLE} REQUIRED Web3::web3jsonrpc Eth::testutils JsonRpc::Client)
 target_link_libraries(${EXECUTABLE} ${Boost_PROGRAM_OPTIONS_LIBRARY})
