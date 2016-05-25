@@ -60,6 +60,7 @@
 #include <libweb3jsonrpc/AdminUtils.h>
 #include <libweb3jsonrpc/Personal.h>
 #include <libweb3jsonrpc/Debug.h>
+#include <libweb3jsonrpc/Test.h>
 #include "PhoneHome.h"
 #include "Farm.h"
 #endif // ETH_JSONRPC
@@ -385,6 +386,7 @@ int main(int argc, char** argv)
 
 	/// Whisper
 	bool useWhisper = false;
+	bool isTest = false;
 
 	string configFile = getDataDir() + "/config.rlp";
 	bytes b = contents(configFile);
@@ -857,6 +859,8 @@ int main(int argc, char** argv)
 			help();
 		else if (arg == "-V" || arg == "--version")
 			version();
+		else if (arg == "--test")
+			isTest = true;
 		else
 		{
 			cerr << "Invalid argument: " << arg << endl;
@@ -999,6 +1003,10 @@ int main(int argc, char** argv)
 
 	auto nodesState = contents(getDataDir() + "/network.rlp");
 	auto caps = useWhisper ? set<string>{"eth", "shh"} : set<string>{"eth"};
+
+	if (isTest)	//force NoProof for testing
+		chainParams.sealEngineName = "NoProof";
+
 	dev::WebThreeDirect web3(
 		WebThreeDirect::composeClientVersion("eth"),
 		getDataDir(),
@@ -1225,11 +1233,16 @@ int main(int argc, char** argv)
 			rpc::EthFace, rpc::DBFace, rpc::WhisperFace,
 			rpc::NetFace, rpc::Web3Face, rpc::PersonalFace,
 			rpc::AdminEthFace, rpc::AdminNetFace, rpc::AdminUtilsFace,
-			rpc::DebugFace
+			rpc::DebugFace, rpc::TestFace
 		>;
+
 		sessionManager.reset(new rpc::SessionManager());
 		accountHolder.reset(new SimpleAccountHolder([&](){ return web3.ethereum(); }, getAccountPassword, keyManager, authenticator));
 		auto ethFace = new rpc::Eth(*web3.ethereum(), *accountHolder.get());
+		rpc::TestFace* testEth = nullptr;
+		if (isTest)
+			testEth = new rpc::TestFace(*web3.ethereum());
+
 		if (jsonRPCURL >= 0)
 		{
 			rpc::AdminEth* adminEth = nullptr;
@@ -1243,11 +1256,13 @@ int main(int argc, char** argv)
 				adminNet = new rpc::AdminNet(web3, *sessionManager.get());
 				adminUtils = new rpc::AdminUtils(*sessionManager.get());
 			}
+
 			jsonrpcHttpServer.reset(new FullServer(
 				ethFace, new rpc::LevelDB(), new rpc::Whisper(web3, {}),
 				new rpc::Net(web3), new rpc::Web3(web3.clientVersion()), personal,
 				adminEth, adminNet, adminUtils,
-				new rpc::Debug(*web3.ethereum())
+				new rpc::Debug(*web3.ethereum()),
+				testEth
 			));
 			auto httpConnector = new SafeHttpServer(jsonRPCURL, "", "", SensibleHttpThreads);
 			httpConnector->setAllowedOrigin(rpcCorsDomain);
@@ -1262,7 +1277,8 @@ int main(int argc, char** argv)
 				new rpc::AdminEth(*web3.ethereum(), *gasPricer.get(), keyManager, *sessionManager.get()),
 				new rpc::AdminNet(web3, *sessionManager.get()),
 				new rpc::AdminUtils(*sessionManager.get()),
-				new rpc::Debug(*web3.ethereum())
+				new rpc::Debug(*web3.ethereum()),
+				testEth
 			));
 			auto ipcConnector = new IpcServer("geth");
 			jsonrpcIpcServer->addConnector(ipcConnector);
