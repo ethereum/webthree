@@ -4,7 +4,7 @@ aux_source_directory(. SRCS)
 aux_source_directory(./libwhisper SRCS)
 aux_source_directory(./libweb3jsonrpc SRCS)
 
-set(EXECUTABLE testweb3)
+set(EXECUTABLE ethrpctest)
 
 file(GLOB HEADERS "*.h")
 add_executable(${EXECUTABLE} ${SRCS} ${HEADERS})

@@ -3,8 +3,6 @@ aux_source_directory(. SRC_LIST)
 include_directories(..)
 include_directories(../..)
 
-set(EXECUTABLE ethrpctest)
-
 file(GLOB HEADERS "*.h")
 
 add_executable(${EXECUTABLE} ${SRC_LIST} ${HEADERS})
