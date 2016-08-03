@@ -1262,7 +1262,7 @@ int main(int argc, char** argv)
 				ethFace, new rpc::LevelDB(), new rpc::Whisper(web3, {}),
 				new rpc::Net(web3), new rpc::Web3(web3.clientVersion()), personal,
 				adminEth, adminNet, adminUtils,
-				new rpc::Debug(*web3.ethereum()),
+				new rpc::Debug(*web3.ethereum(), *accountHolder.get()),
 				testEth
 			));
 			auto httpConnector = new SafeHttpServer(jsonRPCURL, "", "", SensibleHttpThreads);
@@ -1278,7 +1278,7 @@ int main(int argc, char** argv)
 				new rpc::AdminEth(*web3.ethereum(), *gasPricer.get(), keyManager, *sessionManager.get()),
 				new rpc::AdminNet(web3, *sessionManager.get()),
 				new rpc::AdminUtils(*sessionManager.get()),
-				new rpc::Debug(*web3.ethereum()),
+				new rpc::Debug(*web3.ethereum(), *accountHolder.get()),
 				testEth
 			));
 			auto ipcConnector = new IpcServer("geth");
