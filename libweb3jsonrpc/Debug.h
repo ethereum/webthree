@@ -19,7 +19,7 @@ class SessionManager;
 class Debug: public DebugFace
 {
 public:
-	explicit Debug(eth::Client const& _eth, eth::AccountHolder const& _ethAccounts);
+	explicit Debug(eth::Client const& _eth);
 
 	virtual RPCModules implementedModules() const override
 	{
@@ -37,7 +37,6 @@ public:
 private:
 
 	eth::Client const& m_eth;
-	eth::AccountHolder const& m_ethAccounts;
 	h256 blockHash(std::string const& _blockHashOrNumber) const;
 	Json::Value traceTransaction(dev::eth::Executive& _e, dev::eth::Transaction const& _t, Json::Value const& _json);
 	Json::Value traceBlock(dev::eth::Block const& _block, Json::Value const& _json);

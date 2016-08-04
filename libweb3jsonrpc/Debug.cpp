@@ -12,9 +12,8 @@ using namespace dev;
 using namespace dev::rpc;
 using namespace dev::eth;
 
-Debug::Debug(eth::Client const& _eth, eth::AccountHolder const& _ethAccounts):
-	m_eth(_eth),
-	m_ethAccounts(_ethAccounts)
+Debug::Debug(eth::Client const& _eth):
+	m_eth(_eth)
 {}
 
 StandardTrace::DebugOptions debugOptions(Json::Value const& _json)
@@ -143,21 +142,22 @@ Json::Value Debug::debug_traceCall(Json::Value const& _call, std::string const& 
 	Json::Value ret;
 	try
 	{
-		Block temp = m_eth.asOf(jsToBlockNumber(_blockNumber));
+		Block temp = m_eth.block(jsToBlockNumber(_blockNumber));
 		TransactionSkeleton ts = toTransactionSkeleton(_call);
 		if (!ts.from) {
-			ts.from = m_ethAccounts.defaultTransactAccount();
+			ts.from = Address();
 		}
 		u256 nonce = temp.transactionsFrom(ts.from);
 		u256 gas = ts.gas == Invalid256 ? m_eth.gasLimitRemaining() : ts.gas;
 		u256 gasPrice = ts.gasPrice == Invalid256 ? m_eth.gasBidPrice() : ts.gasPrice;
-		Transaction t(ts.value, gasPrice, gas, ts.to, ts.data, nonce);
-		t.forceSender(ts.from);
+		temp.mutableState().addBalance(ts.from, gas * gasPrice + ts.value);
+		Transaction transaction(ts.value, gasPrice, gas, ts.to, ts.data, nonce);
+		transaction.forceSender(ts.from);
 		eth::ExecutionResult er;
 		Executive e(temp);
 		e.setResultRecipient(er);
-		Json::Value trace = traceTransaction(e, t, _options);
-		ret["gas"] = toHex(t.gas(), HexPrefix::Add);
+		Json::Value trace = traceTransaction(e, transaction, _options);
+		ret["gas"] = toHex(transaction.gas(), HexPrefix::Add);
 		ret["return"] = toHex(er.output, 2, HexPrefix::Add);
 		ret["structLogs"] = trace;
 	}
